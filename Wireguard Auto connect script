@@ -1,0 +1,2 @@
+# Restart Wireguard if shutdown
+* * * * * ping -I wg0 -c 1 -W 20 ping.eu> /dev/null ; if [ $? -ne 0 ]; then /etc/init.d/wireguard restart ; fi
