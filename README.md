@@ -2,14 +2,17 @@
 
 ssh root@xxx.xxx.x.xx
 
-wget hhttps://github.com/mayfly04/Wireguard-Vpn/blob/master/wg-ububtu-server-up.sh
+wget https://raw.githubusercontent.com/drew2a/wireguard/master/wg-ubuntu-server-up.sh
+or(Below is a backup. Always use the above one.Master script)
+wget https://github.com/mayfly04/Wireguard-Vpn/blob/master/wg-ububtu-server-up.sh
+
 
 chmod +x ./wg-ububtu-server-up.sh
 
-./wg-ububtu-server-up.sh 10
+sudo ./wg-ububtu-server-up.sh 5 
 
 
-Add this to the client config
+Add this to the client config before connecting on mango router, Especially MTU value.
 
 MTU = 1280
 PostUp = ip route add SERVER_PUBLIC_IP/32 via 192.168.8.1 dev eth0; iptables -A FORWARD -i wg0 -m state --state RELATED,ESTABLISHED -j ACCEPT; iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
