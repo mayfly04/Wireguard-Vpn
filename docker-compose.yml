@@ -1,0 +1,27 @@
+version: '3.7'
+services:
+  wireguard:
+    image: linuxserver/wireguard
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Kolkata #set correct timezone
+      - SERVERPORT=51830 #optional
+      - PEERS=1 #optional
+      - PEERDNS=auto #optional
+      - ALLOWEDIPS=0.0.0.0/0 #Peer addresses allowed
+      - INTERNAL_SUBNET=172.17.0.0 #Subnet used in VPN tunnel
+      - SERVERURL=154.61.76.22 #Wireguard VPN server address
+    volumes:
+      - /opt/wireguard-server/config:/config
+      - /usr/src:/usr/src # location of kernel headers
+      - /lib/modules:/lib/modules
+    ports:
+      - 51830:51830/udp
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: always
