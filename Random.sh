@@ -132,5 +132,40 @@ last_commit=$(git rev-parse development)
 # List changed files in the last commit
 changed_files=$(git diff-tree --no-commit-id --name-only -r $last_commit)
 
+
+
+
+#!/bin/bash
+
+# Directory where Helm charts are located
+CHARTS_DIR="charts"
+
+# Get the list of changed directories
+CHANGED_DIRS=$(git diff --name-only HEAD^ HEAD | grep "^${CHARTS_DIR}/" | cut -d '/' -f 2 | sort | uniq)
+
+# Loop through each changed directory
+for DIR in $CHANGED_DIRS; do
+  CHART_DIR="${CHARTS_DIR}/${DIR}"
+
+  # Check if it's a directory
+  if [ ! -d "$CHART_DIR" ]; then
+    continue
+  fi
+
+  echo "Processing $CHART_DIR..."
+
+  # Bump the version
+  VERSION=$(grep '^version:' $CHART_DIR/Chart.yaml | awk '{print $2}')
+  NEW_VERSION=$(echo $VERSION | awk -F. -v OFS=. '{$NF += 1 ; print}')
+  sed -i "s/^version: .*/version: $NEW_VERSION/" $CHART_DIR/Chart.yaml
+
+  # Generate changelog
+  git log --pretty=format:"* %s (%h)" -- $CHART_DIR > $CHART_DIR/CHANGELOG.md
+
+  # Commit changes
+  git add $CHART_DIR/Chart.yaml $CHART_DIR/CHANGELOG.md
+  git commit -m "chore: bump version and update changelog for $DIR"
+done
+
 # List unique subfolders under the root directory
 echo "$changed_files" | grep -o '^[^/]*/' | sort -u
