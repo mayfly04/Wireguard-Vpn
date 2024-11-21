@@ -79,3 +79,48 @@ echo "Helm lint check passed."
 
 # Extract the chart name from Chart.yaml
 CHART_NAME=$(grep '^name:' "$CHART_DIR/Chart.yaml" | awk '{print $2}')
+
+
+
+
+
+
+
+
+#!/bin/bash
+
+# Ensure script is run from a Git repository
+if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+  echo "Error: This script must be run from inside a Git repository."
+  exit 1
+fi
+
+# Branch to analyze (default: development)
+BRANCH=${1:-"development"}
+
+# Fetch the latest changes from the branch
+git fetch origin "$BRANCH" &>/dev/null || {
+  echo "Error: Failed to fetch branch $BRANCH."
+  exit 1
+}
+
+# Get the latest commit hash on the specified branch
+LAST_COMMIT=$(git rev-parse origin/"$BRANCH") || {
+  echo "Error: Could not find branch $BRANCH."
+  exit 1
+}
+
+echo "Analyzing last commit on branch '$BRANCH': $LAST_COMMIT"
+
+# List all changed paths in the root directory from the last commit
+CHANGED_FOLDERS=$(git diff-tree --no-commit-id --name-only -r "$LAST_COMMIT" | \
+  awk -F'/' '$2 == "" {print $1}' | sort -u)
+
+# Output the results
+if [[ -z "$CHANGED_FOLDERS" ]]; then
+  echo "No subfolders in the root directory were changed."
+else
+  echo "Subfolders in the root directory changed in the last commit:"
+  echo "$CHANGED_FOLDERS"
+fi
+
