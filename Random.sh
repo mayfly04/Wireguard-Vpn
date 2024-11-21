@@ -124,3 +124,13 @@ else
   echo "$CHANGED_FOLDERS"
 fi
 
+#!/bin/bash
+
+# Fetch the last commit hash from the development branch
+last_commit=$(git rev-parse development)
+
+# List changed files in the last commit
+changed_files=$(git diff-tree --no-commit-id --name-only -r $last_commit)
+
+# List unique subfolders under the root directory
+echo "$changed_files" | grep -o '^[^/]*/' | sort -u
