@@ -35,3 +35,41 @@ WORKDIR /usr/src/app
 COPY .releaserc /usr/src/app/.releaserc
 
 ENTRYPOINT ["semantic-release"]
+
+
+
+
+
+#!/bin/bash
+
+set -e
+
+# Define the Helm charts directories
+CHARTS=("chart1" "chart2")
+
+# Loop through each chart directory
+for CHART in "${CHARTS[@]}"; do
+  echo "Processing $CHART..."
+
+  # Change to the chart directory
+  cd "$CHART"
+
+  # Run semantic-release for the chart
+  npx semantic-release
+
+  # Change back to the root directory
+  cd ..
+done
+
+
+
+{
+  "branches": ["main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+    "@semantic-release/git",
+    "@semantic-release/exec"
+  ]
+}
