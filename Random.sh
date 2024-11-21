@@ -63,3 +63,7 @@ Copy code
 ## [1.1.1] - YYYY-MM-DD
 ### Bug Fixes
 - resolve an issue with Y
+
+
+# Extract the chart name from Chart.yaml
+CHART_NAME=$(grep '^name:' "$CHART_DIR/Chart.yaml" | awk '{print $2}')
