@@ -65,5 +65,17 @@ Copy code
 - resolve an issue with Y
 
 
+
+
+
+# Check if helm lint was successful
+if [ $? -ne 0 ]; then
+  echo "Helm lint check failed."
+  exit 1
+fi
+
+echo "Helm lint check passed."
+
+
 # Extract the chart name from Chart.yaml
 CHART_NAME=$(grep '^name:' "$CHART_DIR/Chart.yaml" | awk '{print $2}')
