@@ -207,3 +207,35 @@ if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
   git merge origin/${BRANCH}
 fi
 
+#!/bin/bash
+
+# Variables
+YAML_FILE="your_file.yaml"
+ATTRIBUTE="your_attribute"
+NEW_VALUE="your_new_value"
+GIT_BRANCH="your_branch"
+
+# Update the attribute in the YAML file
+sed -i "s/^${ATTRIBUTE}: .*$/${ATTRIBUTE}: ${NEW_VALUE}/" "$YAML_FILE"
+
+# Commit and push changes
+git checkout "$GIT_BRANCH"
+git add "$YAML_FILE"
+git commit -m "Update ${ATTRIBUTE} to ${NEW_VALUE}"
+git push origin "$GIT_BRANCH"
+
+# If push fails due to merge conflict
+if [ $? -ne 0 ]; then
+    echo "Merge conflict detected. Resolving by force updating..."
+    # Force update local branch
+    git fetch origin
+    git reset --hard origin/"$GIT_BRANCH"
+    
+    # Reapply the update
+    sed -i "s/^${ATTRIBUTE}: .*$/${ATTRIBUTE}: ${NEW_VALUE}/" "$YAML_FILE"
+    git add "$YAML_FILE"
+    git commit -m "Reapply update of ${ATTRIBUTE} to ${NEW_VALUE}"
+    
+    # Force push changes
+    git push --force origin "$GIT_BRANCH"
+fi
