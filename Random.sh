@@ -169,3 +169,31 @@ done
 
 # List unique subfolders under the root directory
 echo "$changed_files" | grep -o '^[^/]*/' | sort -u
+
+
+#!/bin/bash
+
+# Variables
+BRANCH="your-branch"
+FILE_PATH="path/to/your-file.yaml"
+ATTRIBUTE="your-attribute"
+NEW_VALUE="your-new-value"
+
+# Update the YAML attribute using yq
+yq eval ".${ATTRIBUTE} = \"${NEW_VALUE}\"" -i "${FILE_PATH}"
+
+# Check if the branch is out of sync
+git fetch origin
+LOCAL_HASH=$(git rev-parse ${BRANCH})
+REMOTE_HASH=$(git rev-parse origin/${BRANCH})
+
+if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
+  # Resync the branch
+  git checkout ${BRANCH}
+  git pull origin ${BRANCH}
+fi
+
+# Commit and push changes
+git add "${FILE_PATH}"
+git commit -m "Update ${ATTRIBUTE} in ${FILE_PATH}"
+git push origin ${BRANCH}
