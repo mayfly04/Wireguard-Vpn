@@ -193,7 +193,17 @@ if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
   git pull origin ${BRANCH}
 fi
 
+
+
 # Commit and push changes
 git add "${FILE_PATH}"
 git commit -m "Update ${ATTRIBUTE} in ${FILE_PATH}"
 git push origin ${BRANCH}
+
+
+if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
+  # Merge changes if the local branch is behind
+  git checkout ${BRANCH}
+  git merge origin/${BRANCH}
+fi
+
